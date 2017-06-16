@@ -87,7 +87,10 @@ def get_backend_class():
 
 def get_backend():
     backend_class = get_backend_class()
-    return backend_class()
+    try:
+        return backend_class()
+    except TypeError:
+        return backend_class
 
 # Register recivers
 recivers.register()

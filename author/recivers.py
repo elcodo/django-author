@@ -28,7 +28,10 @@ __AUTHOR__ = "lambdalisue (lambdalisue@hashnote.net)"
 import logging
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db.models.signals import pre_save
+
+from six import string_types
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +44,10 @@ def pre_save_callback(sender, instance, **kwargs):
         return
     # get current user via author backend
     user = get_backend().get_user()
+    if isinstance(user, string_types):
+        # if user is username, get user instance
+        UserModel = get_user_model()
+        user = UserModel.objects.get(username=user)
     if settings.AUTHOR_DO_NOT_UPDATE_WHILE_USER_IS_NONE and user is None:
         return
     if getattr(instance, settings.AUTHOR_CREATED_BY_FIELD_NAME) is None:
